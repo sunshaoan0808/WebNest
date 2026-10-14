@@ -1,0 +1,46 @@
+plugins {
+    id 'com.android.application'
+}
+
+// Build-time configuration (GitHub Actions supplies these from repository secrets).
+def serverUrl = (project.findProperty("serverUrl") ?: "").toString().trim()
+if (!serverUrl) {
+    serverUrl = "https://example.com"
+}
+serverUrl = serverUrl.replaceAll('/+$', '')
+
+def appName = (project.findProperty("appName") ?: "").toString().trim()
+if (!appName) {
+    appName = "WebNest"
+}
+
+android {
+    namespace 'com.webnest.shell'
+    compileSdk 34
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    defaultConfig {
+        applicationId "com.webnest.shell"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+        resValue "string", "app_name", appName
+        buildConfigField "String", "SERVER_URL", "\"${serverUrl.replace('\\', '\\\\').replace('"', '\\"')}\""
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
